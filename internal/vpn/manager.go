@@ -178,7 +178,166 @@ func (vm *Manager) Connect() (bool, string) {
 		return false, "vpn-slice nicht gefunden"
 	}
 
-	return vm.connectDirect(openconnectPath, vpnSlicePath, vpnPassword, certPassword)
+	// Verbindung asynchron starten
+	go vm.connectAsync(openconnectPath, vpnSlicePath, vpnPassword, certPassword)
+
+	return true, "VPN-Verbindung wird gestartet... (Status wird automatisch aktualisiert)"
+}
+
+func (vm *Manager) connectAsync(openconnectPath, vpnSlicePath, vpnPassword, certPassword string) {
+	fmt.Printf("Starting async VPN connection...\n")
+
+	args := []string{
+		openconnectPath,
+		vm.Settings.VPNServer,
+		"--authgroup=" + vm.Settings.AuthGroup,
+		"--user=" + vm.Settings.Username,
+		"-c", vm.Settings.CertFile,
+		"--pid-file=/tmp/openconnect.pid",
+		"-s", vpnSlicePath + " " + vm.Settings.Networks,
+	}
+
+	cmd := exec.Command("sudo", args...)
+
+	// Pipes für Output
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Printf("Stdout pipe error: %v\n", err)
+		return
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		fmt.Printf("Stderr pipe error: %v\n", err)
+		return
+	}
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		fmt.Printf("Stdin pipe error: %v\n", err)
+		return
+	}
+
+	// Starten
+	err = cmd.Start()
+	if err != nil {
+		fmt.Printf("Start error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("OpenConnect process started with PID: %d\n", cmd.Process.Pid)
+
+	// Passwörter senden
+	go func() {
+		defer stdin.Close()
+		time.Sleep(2 * time.Second)
+
+		// Zertifikat-Passwort (falls vorhanden)
+		if certPassword != "" {
+			fmt.Printf("Sending certificate password...\n")
+			fmt.Fprintf(stdin, "%s\n", certPassword)
+			time.Sleep(2 * time.Second)
+		}
+
+		// VPN-Passwort
+		fmt.Printf("Sending VPN password...\n")
+		fmt.Fprintf(stdin, "%s\n", vpnPassword)
+	}()
+
+	// Output überwachen
+	connected := make(chan bool, 1)
+	failed := make(chan string, 1)
+
+	// Stdout überwachen
+	go func() {
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			line := scanner.Text()
+			fmt.Printf("VPN Output: %s\n", line)
+
+			if strings.Contains(line, "CSTP connected") ||
+				strings.Contains(line, "Configured as") ||
+				strings.Contains(line, "VPN tunnel running") ||
+				strings.Contains(line, "Connected tun") {
+				fmt.Printf("Connection established detected!\n")
+				connected <- true
+				return
+			}
+		}
+	}()
+
+	// Stderr überwachen
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			line := scanner.Text()
+			fmt.Printf("VPN Error: %s\n", line)
+
+			if strings.Contains(line, "Login failed") ||
+				strings.Contains(line, "Failed to decrypt") ||
+				strings.Contains(line, "Authentication failed") ||
+				strings.Contains(line, "Certificate verification failed") {
+				fmt.Printf("Connection failed detected!\n")
+				failed <- line
+				return
+			}
+		}
+	}()
+
+	// Auf Verbindungsstatus warten (aber nicht zu lange)
+	select {
+	case <-connected:
+		fmt.Printf("VPN successfully connected - process continues in background\n")
+		// Prozess läuft weiter, wir kehren zurück
+		return
+
+	case errMsg := <-failed:
+		fmt.Printf("VPN connection failed: %s\n", errMsg)
+		cmd.Process.Kill()
+		return
+
+	case <-time.After(45 * time.Second):
+		fmt.Printf("Connection timeout reached, checking if connected...\n")
+		// Nach Timeout prüfen ob Verbindung trotzdem da ist
+		time.Sleep(3 * time.Second)
+		if vm.IsConnected() {
+			fmt.Printf("VPN connected despite timeout\n")
+			return
+		}
+
+		fmt.Printf("Connection timeout - killing process\n")
+		cmd.Process.Kill()
+		return
+	}
+
+	// Dieser Code wird nie erreicht, aber zur Sicherheit
+	// cmd.Wait() NICHT aufrufen - das würde ewig warten!
+}
+
+// Verbesserte IsConnected Methode
+func (vm *Manager) IsConnected() bool {
+	// PID-Datei prüfen
+	if fileExists("/tmp/openconnect.pid") {
+		if pidData, err := os.ReadFile("/tmp/openconnect.pid"); err == nil {
+			pid := strings.TrimSpace(string(pidData))
+			if pid != "" && exec.Command("kill", "-0", pid).Run() == nil {
+				return true
+			}
+		}
+		os.Remove("/tmp/openconnect.pid")
+	}
+
+	// Prozess-Suche
+	if output, err := exec.Command("pgrep", "-f", "openconnect").Output(); err == nil {
+		return len(strings.TrimSpace(string(output))) > 0
+	}
+
+	// Netzwerk-Interface prüfen
+	if output, err := exec.Command("ifconfig").Output(); err == nil {
+		return strings.Contains(string(output), "192.168.255.")
+	}
+
+	return false
 }
 
 func (vm *Manager) connectDirect(openconnectPath, vpnSlicePath, vpnPassword, certPassword string) (bool, string) {
@@ -402,31 +561,6 @@ func (vm *Manager) disconnectDirect() (bool, string) {
 	}
 
 	return false, "Disconnect unsicher: " + strings.Join(messages, "; ")
-}
-
-func (vm *Manager) IsConnected() bool {
-	// PID-Datei prüfen
-	if fileExists("/tmp/openconnect.pid") {
-		if pidData, err := os.ReadFile("/tmp/openconnect.pid"); err == nil {
-			pid := strings.TrimSpace(string(pidData))
-			if pid != "" && exec.Command("kill", "-0", pid).Run() == nil {
-				return true
-			}
-		}
-		os.Remove("/tmp/openconnect.pid")
-	}
-
-	// Prozess-Suche
-	if output, err := exec.Command("pgrep", "-f", "openconnect").Output(); err == nil {
-		return len(strings.TrimSpace(string(output))) > 0
-	}
-
-	// Netzwerk-Interface prüfen
-	if output, err := exec.Command("ifconfig").Output(); err == nil {
-		return strings.Contains(string(output), "192.168.255.")
-	}
-
-	return false
 }
 
 func (vm *Manager) findOpenConnectPath() string {
