@@ -1,0 +1,268 @@
+# Binaries
+vpn-web
+vpn-web.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go build artifacts
+*.o
+*.a
+*.test
+*.prof
+*.out
+go.sum
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.error.log
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+.tmp/
+
+# Build and distribution
+dist/
+build/
+release/
+*.zip
+*.tar.gz
+*.dmg
+*-temp.dmg
+
+# Configuration and sensitive data
+.env
+.env.local
+.env.production
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+config.json
+settings.json
+.vpn_web_settings.json
+.vpn_certificates/
+
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# LaunchAgent files (falls lokal getestet)
+*.plist.backup
+
+# Expect scripts (temporary)
+vpn-disconnect-*.exp
+
+# Test coverage
+coverage.out
+coverage.html
+
+# Vendor directory (falls verwendet)
+vendor/
+
+# Node modules (falls Frontend-Tools verwendet werden)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# PID files
+*.pid
+/tmp/openconnect.pid
+
+# Certificate directory contents
+.vpn_certificates/*
+!.vpn_certificates/.gitkeep
+
+# Homebrew
+Brewfile.lock.json
+
+# Go module proxy
+GOPROXY
+GOSUMDB
+
+# Air live reload tool
+.air.toml
+tmp/
+
+# Delve debugger
+__debug_bin
+
+# GoLand
+.idea/
+
+# VS Code
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+.history/
+
+# Local development
+local/
+dev/
+debug/
+
+# OS generated files
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Archives
+*.7z
+*.rar
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Package files
+*.deb
+*.rpm
+*.pkg
+*.dmg
+*.msi
+
+# Documentation build
+docs/_build/
+site/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Environment variables
+.envrc
+
+# Direnv
+.envrc
+
+# Local History for Visual Studio Code
+.history/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+# JetBrains IDEs
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.project
+.externalToolBuilders/
+.cproject
+.autotools
+.factorypath
+.buildpath
+.target
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Ignore test certificates and keys for security
+test_certs/
+*.test.p12
+*.test.pfx
+test.key
+test.crt
+
+*.err
+README.pdf
+create-*.sh

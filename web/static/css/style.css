@@ -1,0 +1,241 @@
+/* Vereinfachtes CSS */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 300;
+}
+
+.status {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  margin: 20px 0;
+}
+
+.status.connected {
+  background: rgba(40, 167, 69, 0.9);
+  color: white;
+}
+.status.disconnected {
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+}
+
+.actions {
+  padding: 30px;
+  text-align: center;
+  background: #f8f9fa;
+}
+
+.btn {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+}
+.btn-success {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+  color: white;
+}
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+}
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d, #545b62);
+  color: white;
+}
+
+.settings-toggle {
+  padding: 20px 30px;
+  background: #f8f9fa;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-panel {
+  padding: 30px;
+  display: none;
+}
+
+.settings-panel.active {
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #495057;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  border-color: #667eea;
+  outline: none;
+}
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+}
+
+.toast {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  margin-bottom: 10px;
+  padding: 16px 20px;
+  display: none;
+  border-left: 4px solid #28a745;
+  position: relative;
+}
+
+.toast.show {
+  display: block;
+}
+.toast.error {
+  border-left-color: #dc3545;
+}
+
+.toast-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.loading::after {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .btn {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+  }
+}
+
+.help-text {
+  color: #666;
+  font-size: 12px;
+}
+
+/* Fügen Sie diese Styles hinzu */
+.help-text.success {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.help-text.error {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.security-info {
+  background: #e8f5e8;
+  border: 1px solid #28a745;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.security-info h4 {
+  margin: 0 0 10px 0;
+  color: #155724;
+}
+
+.security-info p {
+  margin: 0;
+  color: #155724;
+  font-size: 14px;
+}

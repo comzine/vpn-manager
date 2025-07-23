@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <title>VPN Manager</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="container">
+      <div class="header">
+        <h1>🔐 VPN Manager</h1>
+        <div id="status" class="status disconnected">
+          Status wird geladen...
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="connect-btn" class="btn btn-success">🔒 Verbinden</button>
+        <button id="disconnect-btn" class="btn btn-danger">🔓 Trennen</button>
+      </div>
+
+      <div class="settings-toggle" id="settings-toggle">
+        <h3>⚙️ Einstellungen</h3>
+        <span>▼</span>
+      </div>
+
+      <div class="settings-panel" id="settings-panel">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vpn_server">VPN Server:</label>
+            <input
+              type="text"
+              id="vpn_server"
+              value="{{.Settings.VPNServer}}"
+            />
+          </div>
+          <div class="form-group">
+            <label for="auth_group">Auth Group:</label>
+            <input
+              type="text"
+              id="auth_group"
+              value="{{.Settings.AuthGroup}}"
+            />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">Benutzername:</label>
+            <input type="text" id="username" value="{{.Settings.Username}}" />
+          </div>
+          <div class="form-group">
+            <label for="password">VPN Passwort:</label>
+            <input
+              type="password"
+              id="password"
+              placeholder="{{if .PasswordStatus.vpn_password}}✅ In Keychain gespeichert{{else}}Passwort eingeben{{end}}"
+            />
+            {{if .PasswordStatus.vpn_password}}
+            <small class="help-text success"
+              >✅ Sicher in macOS Keychain gespeichert</small
+            >
+            {{else}}
+            <small class="help-text error"
+              >❌ Nicht gespeichert - bitte eingeben</small
+            >
+            {{end}}
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cert_password">Zertifikat Passwort (.pfx/.p12):</label>
+            <input
+              type="password"
+              id="cert_password"
+              placeholder="{{if .PasswordStatus.cert_password}}✅ In Keychain gespeichert{{else}}Passwort für Zertifikat{{end}}"
+            />
+            {{if .PasswordStatus.cert_password}}
+            <small class="help-text success"
+              >✅ Sicher in macOS Keychain gespeichert</small
+            >
+            {{else}}
+            <small class="help-text"
+              >Das Passwort zum Entschlüsseln der .pfx/.p12 Datei</small
+            >
+            {{end}}
+          </div>
+          <div class="form-group">
+            <label for="sudo_password">Sudo Passwort (macOS):</label>
+            <input
+              type="password"
+              id="sudo_password"
+              placeholder="{{if .PasswordStatus.sudo_password}}✅ In Keychain gespeichert{{else}}Ihr macOS Benutzer-Passwort{{end}}"
+            />
+            {{if .PasswordStatus.sudo_password}}
+            <small class="help-text success"
+              >✅ Sicher in macOS Keychain gespeichert</small
+            >
+            {{else}}
+            <small class="help-text">
+              Wird für sudo-Rechte benötigt. Leer lassen wenn passwordless sudo
+              konfiguriert ist.
+            </small>
+            {{end}}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="networks">Netzwerke (durch Leerzeichen getrennt):</label>
+          <input type="text" id="networks" value="{{.Settings.Networks}}" />
+        </div>
+        <div class="form-group">
+          <label for="certificate">Zertifikat (.pfx oder .p12):</label>
+          <input type="file" id="certificate" accept=".pfx,.p12" />
+          <div id="cert-info" class="cert-info">
+            {{if .Settings.CertFileName}}
+            <span class="success">✅ {{.Settings.CertFileName}}</span>
+            {{else}}
+            <span class="error">❌ Kein Zertifikat ausgewählt</span>
+            {{end}}
+          </div>
+        </div>
+
+        <div class="security-info">
+          <h4>🔒 Sicherheit</h4>
+          <p>
+            Alle Passwörter werden sicher in der macOS Keychain gespeichert und
+            nie im Klartext auf der Festplatte abgelegt.
+          </p>
+        </div>
+
+        <button id="save-btn" class="btn btn-primary">💾 Speichern</button>
+      </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
